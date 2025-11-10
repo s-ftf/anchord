@@ -1,0 +1,42 @@
+{
+  "1": {
+    "name": "verus",
+    "daemon_path": "verus-cli/verusd",
+    "cli_path": "verus-cli/verus",
+    "data_dir": "data/VRSC/",
+    "daemon_args": ["-rpcallowip=127.0.0.1"],
+    "cli_args": [],
+    "version_check": {
+			"github_api": "https://api.github.com/repos/VerusCoin/VerusCoin/releases/latest",
+			"version_field": "tag_name",
+			"cli_field": "VRSCversion"
+		}
+  },
+  "2": {
+    "name": "vARRR",
+    "daemon_path": "binaries/verus-cli/verusd",
+    "cli_path": "binaries/verus-cli/verus",
+    "data_dir": "data/verus/",
+    "daemon_args": ["-rpcallowip=127.0.0.1", "-chain=varrr"],
+    "cli_args": ["-chain=varrr"],
+    "version_check": {
+			"github_api": "https://api.github.com/repos/VerusCoin/VerusCoin/releases/latest",
+			"version_field": "tag_name",
+			"cli_field": "VRSCversion"
+		}
+  },
+  "3": {
+    "name": "Pirate",
+    "daemon_path": "pirate/pirated",
+    "cli_path": "pirate/pirate-cli",
+    "data_dir": "data/ARRR/",
+    "daemon_args": ["-rpcallowip=127.0.0.1"],
+    "cli_args": [],
+    "version_check": {
+			"github_api": "https://api.github.com/repos/PirateNetwork/pirate/releases/latest",
+			"version_field": "tag_name",
+			"cli_field": "version"
+		}
+  }
+}
+
