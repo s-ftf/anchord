@@ -112,8 +112,10 @@ def get_remote_version(api_url, field):
         return None, None
 
 def normalize_version(v):
-    if not v:
+    """Return a string version, handling ints and raw values from RPC."""
+    if v is None:
         return ""
+    v = str(v).strip()
     if v.startswith("v"):
         return v[1:]
     match = re.search(r"(\d+\.\d+\.\d+(-\d+)?)", v)

@@ -1,9 +1,9 @@
 {
   "1": {
     "name": "verus",
-    "daemon_path": "verus-cli/verusd",
-    "cli_path": "verus-cli/verus",
-    "data_dir": "data/VRSC/",
+    "daemon_path": "../binaries/verus-cli/verusd",
+    "cli_path": "../binaries/verus-cli/verus",
+    "data_dir": "../data/VRSC/",
     "daemon_args": ["-rpcallowip=127.0.0.1"],
     "cli_args": [],
     "version_check": {
@@ -14,9 +14,9 @@
   },
   "2": {
     "name": "vARRR",
-    "daemon_path": "binaries/verus-cli/verusd",
-    "cli_path": "binaries/verus-cli/verus",
-    "data_dir": "data/verus/",
+    "daemon_path": "../binaries/verus-cli/verusd",
+    "cli_path": "../binaries/verus-cli/verus",
+    "data_dir": "../data/verus/",
     "daemon_args": ["-rpcallowip=127.0.0.1", "-chain=varrr"],
     "cli_args": ["-chain=varrr"],
     "version_check": {
@@ -27,9 +27,9 @@
   },
   "3": {
     "name": "Pirate",
-    "daemon_path": "pirate/pirated",
-    "cli_path": "pirate/pirate-cli",
-    "data_dir": "data/ARRR/",
+    "daemon_path": "../binaries/pirate/pirated",
+    "cli_path": "../binaries/pirate/pirate-cli",
+    "data_dir": "../data/ARRR/",
     "daemon_args": ["-rpcallowip=127.0.0.1"],
     "cli_args": [],
     "version_check": {
