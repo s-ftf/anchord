@@ -80,6 +80,6 @@ htmlcov/
 # Project-specific
 # -----------------------
 
-# Any file or directory that starts with "nites"
-nites*
+# Ignore notes directory and files
+notes*
 

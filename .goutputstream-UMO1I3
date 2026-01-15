@@ -17,8 +17,7 @@
     "daemon_path": "../binaries/verus-cli/verusd",
     "cli_path": "../binaries/verus-cli/verus",
     "data_dir": "../data/pbaas/",
-    "pbaas_dir": "e9e10955b7d16031e3d6f55d9c908a038e3ae47d",
-    "daemon_args": ["-rpcallowip=127.0.0.1", "-experimentalfeatures", "-zmergetoaddress", "-chain=varrr"],
+    "daemon_args": ["-rpcallowip=127.0.0.1", "-experimentalfeatures", "-zmergetoaddress", "-bootstrap=2", "-chain=varrr"],
     "cli_args": ["-chain=varrr"],
     "version_check": {
 			"github_api": "https://api.github.com/repos/VerusCoin/VerusCoin/releases/latest",
@@ -46,10 +45,11 @@
     "data_dir": "../data/ZEC/",
     "daemon_args": ["-rpcallowip=127.0.0.1", "-exportdir=../data/ZEC/"],
     "cli_args": [],
-		"version_check": {
+    "version_check": {
 			"github_api": "https://api.github.com/repos/zcash/zcash/releases/latest",
 			"version_field": "tag_name",
-			"cli_field": "build"
+			"cli_field": "version"
 		}
   }
 }
+

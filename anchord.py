@@ -7,6 +7,8 @@ import re
 import requests
 import shutil
 import errno
+import atexit
+import os
 from pygments import highlight
 from pygments.lexers import JsonLexer
 from pygments.formatters import Terminal256Formatter
@@ -93,6 +95,22 @@ def explain_exec_problem(label: str, want_path: str):
     msg.append("[!] Tip: use absolute paths, or put the binary in PATH and set just the program name in daemons.json.")
     print("\n".join(msg))
 
+def enable_history(histfile="~/.cache/daemon-cli-history"):
+    try:
+        import readline  # noqa
+    except Exception:
+        return False
+
+    path = os.path.expanduser(histfile)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    try:
+        readline.read_history_file(path)
+    except FileNotFoundError:
+        pass
+
+    atexit.register(lambda: readline.write_history_file(path))
+    return True
 
 def get_local_version(cli_path, cli_args, field, data_dir):
     info = getinfo(cli_path, data_dir, cli_args)
@@ -117,8 +135,8 @@ def normalize_version(v):
         return ""
     v = str(v).strip()
     if v.startswith("v"):
-        return v[1:]
-    match = re.search(r"(\d+\.\d+\.\d+(-\d+)?)", v)
+        v = v[1:]
+    match = re.search(r"(\d+\.\d+\.\d+)", v)
     return match.group(1) if match else v
 
 class VersionCheckStyle(Style):
@@ -195,9 +213,22 @@ def getinfo(cli_path, data_dir, cli_args):
     except Exception as e:
         return {"error": str(e)}
 
-def get_log_file_position(data_dir):
+def resolve_log_dir(data_dir, daemon):
+    """Returns the directory to read debug.log from."""
+    if not daemon:
+        return data_dir
+    pbaas_dir = daemon.get("pbaas_dir")
+    if not pbaas_dir:
+        return data_dir
+    candidate = pbaas_dir
+    if not os.path.isabs(candidate):
+        candidate = os.path.join(data_dir, candidate)
+    return candidate if os.path.isdir(candidate) else data_dir
+
+def get_log_file_position(data_dir, daemon=None):
     """Gets the current position of the debug.log file."""
-    debug_log_path = os.path.join(data_dir, 'debug.log')
+    log_dir = resolve_log_dir(data_dir, daemon)
+    debug_log_path = os.path.join(log_dir, 'debug.log')
     try:
         with open(debug_log_path, 'r') as log_file:
             log_file.seek(0, os.SEEK_END)
@@ -205,9 +236,10 @@ def get_log_file_position(data_dir):
     except FileNotFoundError:
         return 0
 
-def read_debug_log(data_dir, last_position, last_message):
+def read_debug_log(data_dir, last_position, last_message, daemon=None):
     """Reads new unique lines from the debug.log file, ignore timestamps and UpdateTip messages."""
-    debug_log_path = os.path.join(data_dir, 'debug.log')
+    log_dir = resolve_log_dir(data_dir, daemon)
+    debug_log_path = os.path.join(log_dir, 'debug.log')
     new_lines = []
     try:
         with open(debug_log_path, 'r') as log_file:
@@ -287,10 +319,10 @@ def launch_daemon(daemon_name, daemon_path, data_dir, daemon_args):
         return False
 
 
-def monitor_startup(daemon_name, cli_path, data_dir, cli_args):
+def monitor_startup(daemon_name, cli_path, data_dir, cli_args, daemon=None):
     """Monitors the daemon until it starts successfully."""
     last_error = None
-    last_log_position = get_log_file_position(data_dir)  # Skip existing log entries
+    last_log_position = get_log_file_position(data_dir, daemon)  # Skip existing log entries
     last_message = None
     while True:
         info = getinfo(cli_path, data_dir, cli_args)
@@ -303,7 +335,12 @@ def monitor_startup(daemon_name, cli_path, data_dir, cli_args):
                 last_error = error_message
 
             # Read new unique lines from debug.log
-            new_log_lines, last_log_position, last_message = read_debug_log(data_dir, last_log_position, last_message)
+            new_log_lines, last_log_position, last_message = read_debug_log(
+                data_dir,
+                last_log_position,
+                last_message,
+                daemon
+            )
             for line in new_log_lines:
                 print(f"[{daemon_name} startup] {line}")
             time.sleep(1)
@@ -363,11 +400,12 @@ def main():
         if not launch_daemon(daemon_name, daemon_abs, data_dir, daemon_args):
             # Launch failed... dont loop forever, show last error and stop
             return
-        monitor_startup(daemon_name, cli_abs, data_dir, cli_args)
+        monitor_startup(daemon_name, cli_abs, data_dir, cli_args, daemon)
     else:
         print("Daemon is already running.")
 
     check_versions(daemon)
+    enable_history()
     cli_interaction(cli_abs, data_dir, cli_args, daemon_name)
 
     
